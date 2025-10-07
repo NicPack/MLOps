@@ -6,18 +6,14 @@ from dotenv import load_dotenv
 from settings import Settings
 
 
-def export_envs(environment: str = "dev") -> None:
+def export_envs(env_path: str, secrets_path: str, environment: str = "dev") -> None:
     environment = environment.lower()
     if environment not in ["dev", "test", "prod"]:
         raise ValueError("env variable not in (dev, test, prod)")
-    if environment == "dev":
-        load_dotenv(".env.dev")
-    elif environment == "test":
-        load_dotenv(".env.test")
-    else:
-        load_dotenv(".env.prod")
+    dotenv_path = f"{env_path}.env.{environment}"
+    load_dotenv(dotenv_path, override=True)
 
-    with open("secrets.yaml") as file:
+    with open(f"{secrets_path}secrets.yaml") as file:
         secrets = yaml.safe_load(file)
 
     for k, v in secrets.items():
@@ -36,7 +32,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    export_envs(args.environment)
+    export_envs(env_path="config", secrets_path="config", environment=args.environment)
 
     settings = Settings()
 
