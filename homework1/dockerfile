@@ -1,4 +1,5 @@
-FROM python:3.13.1-bookworm AS build
+# First stage: build
+FROM python:3.13.1-slim-bookworm AS build
 
 WORKDIR /app
 
@@ -7,7 +8,7 @@ RUN apt-get update && apt-get install -y \
     curl libsnappy-dev make gcc g++ libc6-dev libffi-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install uv and add to PATH in the same layer
+# Install uv and add to PATH
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
     export PATH="/root/.local/bin:$PATH" && \
     uv --version
@@ -20,8 +21,27 @@ COPY pyproject.toml uv.lock ./
 # Install dependencies
 RUN uv sync --frozen --no-dev
 
+# Second stage: runtime
+FROM python:3.13.1-slim-bookworm AS runtime
+
+WORKDIR /app
+
+# Install only runtime dependencies
+RUN apt-get update && apt-get install -y \
+    libsnappy-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy uv from build stage
+COPY --from=build /root/.local/bin/uv /usr/local/bin/uv 
+
+# Copy installed dependencies from build stage
+COPY --from=build /app/.venv /app/.venv
+
+# Add venv to to PATH
+ENV PATH="/app/.venv/bin:$PATH"
+
 COPY . .
 
 EXPOSE 8000
 
-CMD [ "uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port","8000" ]
+CMD [ "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port","8000" ]
