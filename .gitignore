@@ -221,5 +221,6 @@ __marimo__/
 #models
 *model
 *models
-
+*images/
 *data/
+volumes*

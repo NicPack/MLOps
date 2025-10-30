@@ -1,0 +1,12 @@
+services:
+  timescaledb:
+    image: timescale/timescaledb:latest-pg16
+    container_name: 5cdba5229281237bf9b7c5e77658801effb74755d476870691dba7c6c7611661
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=similarity_search_service_db
+    ports:
+      - "5555:5432"
+    volumes:
+      - ./init_db/create_similar_search_service_db.sql:/docker-entrypoint-initdb.d/prepare_similarity_search_service_db.sql
