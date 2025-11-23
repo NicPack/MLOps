@@ -1,0 +1,14 @@
+FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN pip install --no-cache-dir \
+    onnxruntime \
+    sentence-transformers>=5.1.2 \
+    numpy
+
+COPY models/model.onnx /app/model_optimized.onnx
+
+COPY benchmark_onnx.py /app/
+
+CMD ["python", "benchmark_onnx.py"]
