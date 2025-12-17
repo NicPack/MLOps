@@ -1,0 +1,45 @@
+name: CI/CD Workflow
+on:
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REPOSITORY: mlops
+  S3_BUCKET: mlops-lab11-nicolas
+
+jobs:
+  integration:
+    name: checks_and_tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./lab11
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Install dependencies
+        run: uv sync --group integration
+
+      - name: Set up and run ruff
+        uses: astral-sh/ruff-action@v3
+        with:
+          src: "./lab11"
+          args: check --fix
+
+      - name: Format with ruff
+        run: uv run ruff format
+
+      - name: Download model from S3
+        run: |
+          aws s3 sync s3://${{ env.S3_BUCKET }}/model/ ./model/
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+
+      - name: Run pytest
+        run: uv run pytest tests -v -m "not integration"

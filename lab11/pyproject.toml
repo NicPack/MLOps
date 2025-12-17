@@ -1,0 +1,57 @@
+[project]
+name = "mlops"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "boto3>=1.42.0",
+    "fastapi[standard]>=0.118.0",
+    "pandas>=2.3.3",
+    "pre-commit>=4.3.0",
+    "pydantic>=2.11.10",
+    "pydantic-settings>=2.11.0",
+    "scikit-learn>=1.7.2",
+    "sentence-transformers>=5.1.2",
+    "torch>=2.9.1",
+]
+
+[tool.uv.workspace]
+members = [
+    "homework1",
+    ".",
+    ".",
+]
+
+[dependency-groups]
+deployment = [
+    "boto3>=1.42.0",
+]
+inference = [
+    "boto3>=1.42.0",
+    "fastapi>=0.123.3",
+    "onnx>=1.20.0",
+    "onnxruntime>=1.23.2",
+    "pydantic-settings>=2.12.0",
+    "tokenizers>=0.22.1",
+]
+integration = [
+    "boto3>=1.42.0",
+    "fastapi>=0.123.3",
+    "onnx>=1.20.0",
+    "onnxruntime>=1.23.2",
+    "pre-commit>=4.5.0",
+    "pydantic>=2.12.5",
+    "pytest>=9.0.2",
+    "scikit-learn>=1.7.2",
+    "tokenizers>=0.22.1",
+    "torch>=2.9.1",
+    "transformers>=4.57.3",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+markers = [
+    "integration: Integration tests requiring model files"
+]
