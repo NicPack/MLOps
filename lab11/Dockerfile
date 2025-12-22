@@ -25,4 +25,4 @@ COPY model ./model
 
 # Run the application
 ENTRYPOINT ["python", "-m", "awslambdaric"]
-CMD ["app.handler"]
+CMD ["sentiment_app.app.handler"]
