@@ -62,7 +62,7 @@ jobs:
         uses: astral-sh/setup-uv@v7
 
       - name: Install dependencies
-        run: uv sync --group deployment
+        run: uv sync --group inference
       
       - name: Download model from S3
         run: |
